@@ -14,7 +14,7 @@ sudo rpm --import https://pkg.jenkins.io/redhat-stable/jenkins.io-2023.key
 sudo yum upgrade
 
 # Install Java (Amazon Linux 2):
-# sudo amazon-linux-extras install java-openjdk11 -y
+sudo amazon-linux-extras install java-openjdk11 -y
 
 #  Install Java (Amazon Linux 2023):
 sudo dnf install java-11-amazon-corretto -y

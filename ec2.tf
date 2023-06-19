@@ -1,17 +1,26 @@
 # configured aws provider with proper credentials
+terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 4.0"
+    }
+  }
+}
+
 provider "aws" {
   region  = "us-east-1"
-  profile = "terraform-user"
+  profile = "terraform-ecs"
 }
 
 
 # store the terraform state file in s3
 terraform {
   backend "s3" {
-    bucket  = "o3cloudng-terraform-state-bucket"
+    bucket  = "o3cloudng-terraform-state-bucket-1"
     key     = "build/terraform.tfstate"
     region  = "us-east-1"
-    profile = "terraform-user"
+    profile = "terraform-ecs"
   }
 }
 
@@ -44,6 +53,14 @@ resource "aws_security_group" "ec2_security_group" {
   name        = "ec2 security group"
   description = "allow access on ports 80 and 22"
   vpc_id      = aws_default_vpc.default_vpc.id
+
+  ingress {
+    description = "http access"
+    from_port   = 8080
+    to_port     = 8080
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 
   ingress {
     description = "http access"
@@ -97,11 +114,11 @@ resource "aws_instance" "ec2_instance" {
   instance_type          = "t2.micro"
   subnet_id              = aws_default_subnet.default_az1.id
   vpc_security_group_ids = [aws_security_group.ec2_security_group.id]
-  key_name               = "myec2key"
-  user_data              = file("install_techmax.sh")
+  key_name               = "terraform-key-pair"
+  user_data              = "${file("install_jenkins.sh")}"
 
   tags = {
-    Name = "techmax server"
+    Name = "Jenkins server"
   }
 }
 
